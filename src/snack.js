@@ -11,6 +11,7 @@ var bricks = {
 	isEaten: false,
 	eatDetection: function() {
 		var _this = this;
+		// 判斷頭是否有吃到
 		if (_this.data[0].x === _this.newX && _this.data[0].y === _this.newY) {
 			_this.data.push({
 				x: _this.data[_this.data.length - 1].x + _this.width,
@@ -18,9 +19,18 @@ var bricks = {
 				color: 'yellow'
 			});
 			_this.isEaten = true;
+		} else {
+			var firstBrick = _this.data[0];
+			for (var i = 1; i < _this.data.length; i++) {
+				if (firstBrick.x === _this.data[i].x && firstBrick.y === _this.data[i].y) {
+					alert('game over');
+					window.location.reload();
+				}
+			}
 		}
 	},
 	collision: function() {
+		// 是否已超出邊界
 		var _this = this;
 		if (
 			_this.data[0].x + _this.width > canvas.width ||
