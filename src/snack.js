@@ -41,11 +41,26 @@ var bricks = {
 		}
 	},
 	data: [],
+	isContinue: false, // 是否持續
+	checkContinue: function() {
+		// 檢查是否要持續
+		if (keyboard.counter <= _this.data.length - 1 || keyboard.counter > _this.data.length)
+			if (!this.isContinue) this.isContinue = true;
+	},
+	checkReset: function() {
+		var _this = this;
+		if (_this.isContinue) {
+			keyboard.counter = 1;
+			_this.isContinue = false;
+		}
+	},
 	move: function() {
 		_this = this;
 
 		if (keyboard.isUpPress) {
+			console.log('keypress up ');
 			if (_this.data.length > 2) {
+				_this.checkContinue();
 				// 假如keyboard 按的個數小於總數的話，代表他須隨時變形
 				// 否則只需直直走
 				if (keyboard.counter <= _this.data.length - 1) {
@@ -95,6 +110,57 @@ var bricks = {
 					}
 				}
 			}
+		} else if (keyboard.isLeftPress) {
+			console.log('keypress left');
+
+			//代表某個動作結束後才開始執行此動作
+			if (this.isContinue) {
+				keyboard.counter = 1;
+				this.isContinue = false;
+			}
+
+			if (_this.data.length > 2) {
+				// 假如keyboard 按的個數小於總數的話，代表他須隨時變形
+				// 否則只需直直走
+				if (keyboard.counter <= _this.data.length - 1) {
+					var i = keyboard.counter;
+					var v = _this.data[i];
+					var next = i + 1;
+
+					if (next >= _this.data.length) next = _this.data.length - 1;
+
+					if (_this.data[i].x - _this.data[next].x === 0) {
+						for (var j = keyboard.counter; j < _this.data.length; j++) {
+							v = _this.data[j];
+							_this.data[j] = {
+								x: v.x,
+								y: v.y - _this.height,
+								color: v.color
+							};
+						}
+
+						if (keyboard.counter >= 1) {
+							for (var z = 0; z < keyboard.counter; z++) {
+								v = _this.data[z];
+								_this.data[z] = {
+									x: v.x - _this.width,
+									y: v.y,
+									color: v.color
+								};
+							}
+						}
+					}
+				} else {
+					for (var i = 0; i < _this.data.length; i++) {
+						v = _this.data[i];
+						_this.data[i] = {
+							x: v.x - _this.width,
+							y: v.y,
+							color: v.color
+						};
+					}
+				}
+			}
 		}
 	}
 };
@@ -108,13 +174,11 @@ var keyboard = {
 	keyUpHandler: function(e) {
 		// press keyboard up
 		// detect up down left right
-		console.log('[trigger keyboard up]');
 		keyboard.triggerPress(e.keyCode);
 	},
 	keyDownHandler: function(e) {
 		// press keyboard down
 		// step1: detect up down left right
-		console.log('[trigger keyboard down]');
 		keyboard.triggerPress(e.keyCode);
 
 		// step2: move bricks
@@ -124,7 +188,9 @@ var keyboard = {
 		switch (keycode) {
 			case 37: // left
 				this.isLeftPress = !this.isLeftPress;
-				//this.counter++;
+				if (this.isLeftPress) {
+					this.counter++;
+				}
 				break;
 			case 38: // up
 				this.isUpPress = !this.isUpPress;
