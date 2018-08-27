@@ -9,6 +9,7 @@ var bricks = {
 	newX: 0,
 	newY: 0,
 	isEaten: false,
+	isShow: false,
 	eatDetection: function() {
 		var _this = this;
 		// 判斷頭是否有吃到
@@ -19,6 +20,9 @@ var bricks = {
 				color: 'yellow'
 			});
 			_this.isEaten = true;
+			_this.isShow = false;
+			_this.newX = 0;
+			_this.newY = 0;
 		} else {
 			var firstBrick = _this.data[0];
 			for (var i = 1; i < _this.data.length; i++) {
@@ -42,20 +46,31 @@ var bricks = {
 			window.location.reload();
 		}
 	},
+	random: function(max) {
+		// 產生亂數
+		return Math.floor(Math.random() * Math.floor(max));
+	},
 	randomDraw: function() {
-		var positionX = canvas.width - 50;
-		var positionY = canvas.height - 50;
-
 		ctx.beginPath();
-		ctx.rect(positionX, positionY, this.width, this.height);
+		if (!this.isShow) {
+			var widthMax = Math.floor(canvas.width / this.width);
+			var heightMax = Math.floor(canvas.height / this.height);
+			var widthRandom = this.random(widthMax) + 1;
+			var heightRandom = this.random(heightMax) + 1;
+			var positionX = canvas.width - widthRandom * this.width;
+			var positionY = canvas.height - heightRandom * this.height;
+
+			ctx.rect(positionX, positionY, this.width, this.height);
+			this.newX = positionX;
+			this.newY = positionY;
+		} else {
+			ctx.rect(this.newX, this.newY, this.width, this.height);
+		}
 		ctx.fillStyle = 'yellow';
 		ctx.strokeStyle = 'black';
 		ctx.stroke();
 		ctx.fill();
 		ctx.closePath();
-
-		this.newX = positionX;
-		this.newY = positionY;
 	},
 	draw: function(offsetX, offsetY, color) {
 		var positionX = canvas.width - offsetX;
@@ -222,10 +237,15 @@ document.addEventListener('keydown', keyboard.keyDownHandler, false);
 document.addEventListener('keyup', keyboard.keyUpHandler, false);
 
 function draw() {
-	// drawSquare();
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	bricks.drawAll();
-	if (!bricks.isEaten) bricks.randomDraw();
+
+	if (bricks.isShow) bricks.randomDraw();
+	if (!bricks.isShow) {
+		bricks.randomDraw();
+		bricks.isShow = true;
+	}
+
 	requestAnimationFrame(draw);
 }
 
