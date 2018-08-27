@@ -10,6 +10,8 @@ var bricks = {
 	newY: 0,
 	isEaten: false,
 	isShow: false,
+	tmpPositionX: 0, // 供外面使用
+	tmpPositionY: 0, // 供外面使用
 	eatDetection: function() {
 		var _this = this;
 		// 判斷頭是否有吃到
@@ -45,24 +47,33 @@ var bricks = {
 			alert('game over');
 			window.location.reload();
 		}
+		console.log(_this.data[0]);
 	},
 	random: function(max) {
 		// 產生亂數
 		return Math.floor(Math.random() * Math.floor(max));
 	},
-	randomDraw: function() {
-		ctx.beginPath();
+	generateNewPosition: function() {
+		// 產生位置
+		var widthMax = Math.floor(canvas.width / this.width);
+		var heightMax = Math.floor(canvas.height / this.height);
+		var widthRandom = this.random(widthMax) + 1;
+		var heightRandom = this.random(heightMax) + 1;
+		var positionX = canvas.width - widthRandom * this.width;
+		var positionY = canvas.height - heightRandom * this.height;
 		if (!this.isShow) {
-			var widthMax = Math.floor(canvas.width / this.width);
-			var heightMax = Math.floor(canvas.height / this.height);
-			var widthRandom = this.random(widthMax) + 1;
-			var heightRandom = this.random(heightMax) + 1;
-			var positionX = canvas.width - widthRandom * this.width;
-			var positionY = canvas.height - heightRandom * this.height;
-
 			ctx.rect(positionX, positionY, this.width, this.height);
 			this.newX = positionX;
 			this.newY = positionY;
+		} else {
+			this.tmpPositionX = positionX;
+			this.tmpPositionY = positionY;
+		}
+	},
+	randomDraw: function() {
+		ctx.beginPath();
+		if (!this.isShow) {
+			this.generateNewPosition();
 		} else {
 			ctx.rect(this.newX, this.newY, this.width, this.height);
 		}
@@ -109,6 +120,7 @@ var bricks = {
 	data: [],
 	changePosition: function(direction) {
 		var _this = this;
+
 		for (var i = 0; i < _this.data.length; i++) {
 			v = _this.data[i];
 
@@ -213,6 +225,21 @@ var keyboard = {
 					}
 					break;
 			}
+		} else {
+			switch (direction) {
+				case 'up':
+					this.isUpPress = !this.isUpPress;
+					break;
+				case 'down':
+					this.isDownPress = !this.isDownPress;
+					break;
+				case 'left':
+					this.isLeftPress = !this.isLeftPress;
+					break;
+				case 'right':
+					this.isRightPress = !this.isRightPress;
+					break;
+			}
 		}
 	},
 	triggerPress: function(keycode) {
@@ -249,9 +276,28 @@ function draw() {
 	requestAnimationFrame(draw);
 }
 
-bricks.draw(100, 100, 'blue');
-bricks.draw(125, 100, 'red');
-bricks.draw(150, 100, 'green');
-bricks.draw(175, 100, 'gray');
-bricks.draw(200, 100, 'gray');
+// bricks.draw(125, 100, 'red');
+// bricks.draw(150, 100, 'green');
+// bricks.draw(175, 100, 'gray');
+// bricks.draw(200, 100, 'gray');
 draw();
+
+bricks.generateNewPosition();
+var positionX = bricks.tmpPositionX;
+var positionY = bricks.tmpPositionY;
+
+if (positionX === bricks.newX && positionY === bricks.newY) {
+	if (positionX === canvas.width) {
+		positionX -= bricks.width;
+	} else {
+		positionX += bricks.width;
+	}
+
+	if (positionY === canvas.height) {
+		positionY -= bricks.height;
+	} else {
+		positionY += bricks.height;
+	}
+}
+
+bricks.draw(canvas.width - positionX, canvas.height - positionY, 'blue');
