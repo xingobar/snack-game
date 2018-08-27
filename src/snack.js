@@ -2,8 +2,8 @@ var canvas = document.getElementById('snack_canvas');
 var ctx = canvas.getContext('2d');
 
 var bricks = {
-	width: 25,
-	height: 25,
+	width: 20,
+	height: 20,
 	vy: 5,
 	vx: 5,
 	newX: 0,
@@ -41,13 +41,12 @@ var bricks = {
 		if (
 			_this.data[0].x + _this.width > canvas.width ||
 			_this.data[0].y + _this.height > canvas.height ||
-			_this.data[0].x + _this.width < 0 ||
-			_this.data[0].y + _this.height < 0
+			_this.data[0].x < 0 ||
+			_this.data[0].y < 0
 		) {
 			alert('game over');
 			window.location.reload();
 		}
-		console.log(_this.data[0]);
 	},
 	random: function(max) {
 		// 產生亂數
@@ -66,6 +65,7 @@ var bricks = {
 			this.newX = positionX;
 			this.newY = positionY;
 		} else {
+			//供外面暫時存取用
 			this.tmpPositionX = positionX;
 			this.tmpPositionY = positionY;
 		}
