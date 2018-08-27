@@ -6,6 +6,47 @@ var bricks = {
 	height: 25,
 	vy: 5,
 	vx: 5,
+	newX: 0,
+	newY: 0,
+	isEaten: false,
+	eatDetection: function() {
+		var _this = this;
+		if (_this.data[0].x === _this.newX && _this.data[0].y === _this.newY) {
+			_this.data.push({
+				x: _this.data[_this.data.length - 1].x + _this.width,
+				y: _this.data[_this.data.length - 1].y + _this.height,
+				color: 'yellow'
+			});
+			_this.isEaten = true;
+		}
+	},
+	collision: function() {
+		var _this = this;
+		if (
+			_this.data[0].x + _this.width > canvas.width ||
+			_this.data[0].y + _this.height > canvas.height ||
+			_this.data[0].x + _this.width < 0 ||
+			_this.data[0].y + _this.height < 0
+		) {
+			alert('game over');
+			window.location.reload();
+		}
+	},
+	randomDraw: function() {
+		var positionX = canvas.width - 50;
+		var positionY = canvas.height - 50;
+
+		ctx.beginPath();
+		ctx.rect(positionX, positionY, this.width, this.height);
+		ctx.fillStyle = 'yellow';
+		ctx.strokeStyle = 'black';
+		ctx.stroke();
+		ctx.fill();
+		ctx.closePath();
+
+		this.newX = positionX;
+		this.newY = positionY;
+	},
 	draw: function(offsetX, offsetY, color) {
 		var positionX = canvas.width - offsetX;
 		var positionY = canvas.height - offsetY;
@@ -86,6 +127,11 @@ var bricks = {
 			}
 			prevX = v.x;
 			prevY = v.y;
+
+			if (i === 0) {
+				_this.eatDetection();
+				_this.collision();
+			}
 		}
 	},
 	move: function() {
@@ -169,6 +215,7 @@ function draw() {
 	// drawSquare();
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	bricks.drawAll();
+	if (!bricks.isEaten) bricks.randomDraw();
 	requestAnimationFrame(draw);
 }
 
