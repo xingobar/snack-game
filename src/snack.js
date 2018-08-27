@@ -118,7 +118,7 @@ var bricks = {
 				keyboard.counter = 1;
 				this.isContinue = false;
 			}
-
+			console.log(`keyboard counter => ${keyboard.counter}`);
 			if (_this.data.length > 2) {
 				// 假如keyboard 按的個數小於總數的話，代表他須隨時變形
 				// 否則只需直直走
@@ -148,6 +148,33 @@ var bricks = {
 									color: v.color
 								};
 							}
+						}
+					} else if (_this.data[i].y - _this.data[next].y === 0) {
+						// todo
+
+						v = _this.data[keyboard.counter];
+						_this.data[keyboard.counter] = {
+							x: v.x,
+							y: v.y - _this.height,
+							color: v.color
+						};
+
+						for (var j = keyboard.counter + 1; j < _this.data.length; j++) {
+							v = _this.data[j];
+							_this.data[j] = {
+								x: v.x + this.width,
+								y: v.y,
+								color: v.color
+							};
+						}
+
+						for (var z = 0; z < keyboard.counter; z++) {
+							v = _this.data[z];
+							_this.data[z] = {
+								x: v.x - _this.width,
+								y: v.y,
+								color: v.color
+							};
 						}
 					}
 				} else {
