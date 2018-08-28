@@ -1,5 +1,6 @@
 var canvas = document.getElementById('snack_canvas');
 var ctx = canvas.getContext('2d');
+var moveInterval = null;
 
 var bricks = {
 	width: 20,
@@ -199,7 +200,7 @@ var keyboard = {
 	isLeftPress: false,
 	isRightPress: false,
 	keyUpHandler: function(e) {
-		keyboard.triggerPress(e.keyCode);
+		//keyboard.triggerPress(e.keyCode);
 	},
 	keyDownHandler: function(e) {
 		keyboard.triggerPress(e.keyCode);
@@ -213,38 +214,70 @@ var keyboard = {
 			switch (direction) {
 				case 'up':
 					if (diffX > 0 || diffX < 0 || diffY < 0) {
+						clearInterval = null;
 						this.isUpPress = !this.isUpPress;
+						this.isDownPress = false;
+						this.isLeftPress = false;
+						this.isRightPress = false;
 					}
 					break;
 				case 'down':
 					if (diffX > 0 || diffX < 0 || diffY > 0) {
+						clearInterval = null;
 						this.isDownPress = !this.isDownPress;
+						this.isUpPress = false;
+						this.isLeftPress = false;
+						this.isRightPress = false;
 					}
 					break;
 				case 'left':
 					if (diffX < 0 || diffY < 0 || diffY > 0) {
+						clearInterval = null;
 						this.isLeftPress = !this.isLeftPress;
+						this.isUpPress = false;
+						this.isDownPress = false;
+						this.isRightPress = false;
 					}
 					break;
 				case 'right':
 					if (diffX > 0 || diffY < 0 || diffY > 0) {
+						clearInterval = null;
 						this.isRightPress = !this.isRightPress;
+						this.isUpPress = false;
+						this.isDownPress = false;
+						this.isLeftPress = false;
 					}
 					break;
 			}
 		} else {
 			switch (direction) {
 				case 'up':
+					clearInterval = null;
 					this.isUpPress = !this.isUpPress;
+					this.isDownPress = false;
+					this.isLeftPress = false;
+					this.isRightPress = false;
 					break;
 				case 'down':
+					clearInterval = null;
 					this.isDownPress = !this.isDownPress;
+					this.isUpPress = false;
+					this.isLeftPress = false;
+					this.isRightPress = false;
 					break;
 				case 'left':
+					clearInterval = null;
 					this.isLeftPress = !this.isLeftPress;
+					this.isUpPress = false;
+					this.isDownPress = false;
+					this.isRightPress = false;
 					break;
 				case 'right':
+					clearInterval = null;
 					this.isRightPress = !this.isRightPress;
+					this.isUpPress = false;
+					this.isDownPress = false;
+					this.isLeftPress = false;
 					break;
 			}
 		}
@@ -279,6 +312,12 @@ function draw() {
 	if (!bricks.isShow) {
 		bricks.randomDraw();
 		bricks.isShow = true;
+	}
+
+	if (!moveInterval) {
+		moveInterval = setInterval(function() {
+			bricks.move();
+		}, 500);
 	}
 
 	requestAnimationFrame(draw);
